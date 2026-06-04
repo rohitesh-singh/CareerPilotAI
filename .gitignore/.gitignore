@@ -1,0 +1,16 @@
+venv/
+.env
+
+__pycache__/
+*.pyc
+
+.streamlit/
+
+generated_resumes/*.docx
+
+.DS_Store
+
+.idea/
+.vscode/
+
+*.log
