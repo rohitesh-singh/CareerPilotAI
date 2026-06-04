@@ -2,6 +2,34 @@
 
 ### AI-Powered Career Operating System
 
+## 🏗️ System Architecture
+
+```mermaid
+flowchart TD
+
+A[User]
+
+A --> B[Streamlit Frontend]
+
+B --> C[Resume Optimizer]
+B --> D[Resume Generator]
+B --> E[Application Tracker]
+B --> F[Analytics Dashboard]
+B --> G[Resume Library]
+
+C --> H[Groq AI]
+D --> H
+
+C --> I[Supabase]
+D --> I
+E --> I
+F --> I
+G --> I
+
+I --> J[(Applications)]
+I --> K[(Generated Resumes)]
+```
+
 ## Screenshots
 
 ### 📊 Dashboard
