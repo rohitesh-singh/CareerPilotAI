@@ -11,23 +11,28 @@ supabase = get_supabase()
 st.title("📝 Resume Generator")
 
 first_name = st.text_input(
-    "First Name"
+    "First Name",
+    value=st.session_state.get("first_name", "")
 )
 
 last_name = st.text_input(
-    "Last Name"
+    "Last Name",
+    value=st.session_state.get("last_name", "")
 )
 
 company = st.text_input(
-    "Company Name"
+    "Company Name",
+    value=st.session_state.get("company", "")
 )
 
 role = st.text_input(
-    "Role"
+    "Role",
+    value=st.session_state.get("role", "")
 )
 
 job_url = st.text_input(
-    "Job URL (Optional)"
+    "Job URL (Optional)",
+    value=st.session_state.get("job_url", "")
 )
 
 uploaded_resume = st.file_uploader(
@@ -94,6 +99,18 @@ if "generated_resume" in st.session_state:
         "role",
         "Resume"
     )
+
+    match_score = st.session_state.get(
+        "match_score",
+        0
+    )
+
+    if match_score > 0:
+
+        st.metric(
+            "ATS Match Score",
+            f"{match_score}%"
+        )
 
     existing = supabase.table(
         "generated_resumes"
@@ -225,7 +242,7 @@ if "generated_resume" in st.session_state:
                             "job_url",
                             ""
                         ),
-                        "match_score": 0,
+                        "match_score": match_score,
                         "status": "Applied",
                         "resume_filename": resume_filename
                     }
@@ -250,3 +267,4 @@ if "generated_resume" in st.session_state:
     st.markdown(
         optimized_resume
     )
+

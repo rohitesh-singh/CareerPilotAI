@@ -47,10 +47,41 @@ if st.button("Analyze Match"):
                 job_description
             )
 
-        st.session_state["analysis_result"] = result
-        st.session_state["company"] = company
-        st.session_state["role"] = role
-        st.session_state["job_url"] = job_url
+        st.session_state[
+            "analysis_result"
+        ] = result
+
+        st.session_state[
+            "company"
+        ] = company
+
+        st.session_state[
+            "role"
+        ] = role
+
+        st.session_state[
+            "job_url"
+        ] = job_url
+
+        st.session_state[
+            "match_score"
+        ] = result.get(
+            "match_score",
+            0
+        )
+
+        st.session_state[
+            "interview_probability"
+        ] = result.get(
+            "interview_probability",
+            "Unknown"
+        )
+
+    else:
+
+        st.error(
+            "Upload a resume and paste a job description."
+        )
 
 if "analysis_result" in st.session_state:
 
@@ -62,7 +93,7 @@ if "analysis_result" in st.session_state:
         "Analysis Complete"
     )
 
-    score = result.get(
+    score = st.session_state.get(
         "match_score",
         0
     )
@@ -139,19 +170,17 @@ if "analysis_result" in st.session_state:
         "Interview Probability"
     )
 
-    probability = result.get(
-        "interview_probability",
-        "Unknown"
-    )
-
     st.info(
-        probability
+        st.session_state.get(
+            "interview_probability",
+            "Unknown"
+        )
     )
 
     st.divider()
 
     st.subheader(
-        "Save Application"
+        "Save Job"
     )
 
     if st.button(
@@ -182,7 +211,7 @@ if "analysis_result" in st.session_state:
             ).execute()
 
             st.success(
-                "Application saved successfully."
+                "Job saved successfully."
             )
 
         except Exception as e:
