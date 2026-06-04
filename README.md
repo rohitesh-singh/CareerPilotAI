@@ -4,17 +4,25 @@
 
 ## Screenshots
 
-| Dashboard | Resume Optimizer |
-|------------|------------|
-| ![](docs/screenshots/dashboard.png) | ![](docs/screenshots/resume_optimizer.png) |
+### 📊 Dashboard
 
-| Resume Generator | Analytics |
-|------------|------------|
-| ![](docs/screenshots/resume_generator.png) | ![](docs/screenshots/analytics.png) |
+![Dashboard](docs/screenshots/dashboard.png)
 
-| Application Tracker |
-|------------|
-| ![](docs/screenshots/application_tracker.png) |
+### 📄 Resume Optimizer
+
+![Resume Optimizer](docs/screenshots/resume_optimizer.png)
+
+### 📝 Resume Generator
+
+![Resume Generator](docs/screenshots/resume_generator.png)
+
+### 💼 Application Tracker
+
+![Application Tracker](docs/screenshots/application_tracker.png)
+
+### 📈 Analytics Dashboard
+
+![Analytics Dashboard](docs/screenshots/analytics.png)
 
 CareerPilotAI is an AI-powered platform that helps professionals optimize resumes, analyze job fit, generate tailored resumes, track applications, and monitor job search performance through a unified dashboard.
 
