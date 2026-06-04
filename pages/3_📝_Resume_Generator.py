@@ -9,6 +9,14 @@ supabase = get_supabase()
 
 st.title("📝 Resume Generator")
 
+first_name = st.text_input(
+    "First Name"
+)
+
+last_name = st.text_input(
+    "Last Name"
+)
+
 company = st.text_input(
     "Company Name"
 )
@@ -48,21 +56,13 @@ if st.button("Generate Optimized Resume"):
                 job_description
             )
 
-        st.session_state[
-            "generated_resume"
-        ] = optimized_resume
+        st.session_state["generated_resume"] = optimized_resume
 
-        st.session_state[
-            "company"
-        ] = company
-
-        st.session_state[
-            "role"
-        ] = role
-
-        st.session_state[
-            "job_url"
-        ] = job_url
+        st.session_state["first_name"] = first_name
+        st.session_state["last_name"] = last_name
+        st.session_state["company"] = company
+        st.session_state["role"] = role
+        st.session_state["job_url"] = job_url
 
         st.success(
             "Resume Generated Successfully"
@@ -80,8 +80,52 @@ if "generated_resume" in st.session_state:
         "generated_resume"
     ]
 
+    first_name = st.session_state.get(
+        "first_name",
+        "Candidate"
+    )
+
+    last_name = st.session_state.get(
+        "last_name",
+        ""
+    )
+
+    role = st.session_state.get(
+        "role",
+        "Resume"
+    )
+
+    existing = supabase.table(
+        "generated_resumes"
+    ).select(
+        "resume_version"
+    ).eq(
+        "first_name",
+        first_name
+    ).eq(
+        "last_name",
+        last_name
+    ).eq(
+        "role",
+        role
+    ).execute()
+
+    version = len(
+        existing.data
+    ) + 1
+
+    safe_role = (
+        role.strip()
+        .replace(" ", "_")
+    )
+
+    resume_filename = (
+        f"{first_name}_{last_name}_{safe_role}_V{version}"
+    )
+
     docx_path = create_resume_docx(
-        optimized_resume
+        optimized_resume,
+        resume_filename
     )
 
     with open(
@@ -92,7 +136,7 @@ if "generated_resume" in st.session_state:
         st.download_button(
             label="📥 Download DOCX Resume",
             data=file,
-            file_name="optimized_resume.docx",
+            file_name=f"{resume_filename}.docx",
             mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         )
 
@@ -110,24 +154,62 @@ if "generated_resume" in st.session_state:
                     "generated_resumes"
                 ).insert(
                     {
+                        "first_name": first_name,
+                        "last_name": last_name,
                         "company": st.session_state.get(
                             "company",
                             "Unknown"
                         ),
-                        "role": st.session_state.get(
-                            "role",
-                            "Unknown"
-                        ),
+                        "role": role,
                         "job_url": st.session_state.get(
                             "job_url",
                             ""
                         ),
-                        "resume_content": optimized_resume
+                        "resume_content": optimized_resume,
+                        "resume_version": version,
+                        "resume_filename": resume_filename
                     }
                 ).execute()
 
                 st.success(
                     "Resume saved successfully."
+                )
+
+            except Exception as e:
+
+                st.error(
+                    str(e)
+                )
+
+    with col2:
+
+        if st.button(
+            "🚀 Apply & Save Application"
+        ):
+
+            try:
+
+                supabase.table(
+                    "applications"
+                ).insert(
+                    {
+                        "company": st.session_state.get(
+                            "company",
+                            "Unknown"
+                        ),
+                        "role": role,
+                        "job_url": st.session_state.get(
+                            "job_url",
+                            ""
+                        ),
+                        "match_score": 0,
+                        "status": "Applied",
+                        "resume_filename": resume_filename
+                    }
+                ).execute()
+
+                st.success(
+                    "Application saved successfully."
                 )
 
             except Exception as e:

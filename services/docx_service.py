@@ -4,15 +4,22 @@ import os
 
 def create_resume_docx(
     resume_content,
-    output_file="generated_resumes/optimized_resume.docx"
+    resume_filename
 ):
 
-    # Create folder if it doesn't exist
-    os.makedirs("generated_resumes", exist_ok=True)
+    os.makedirs(
+        "generated_resumes",
+        exist_ok=True
+    )
+
+    output_file = (
+        f"generated_resumes/{resume_filename}.docx"
+    )
 
     doc = Document()
 
     for line in resume_content.split("\n"):
+
         doc.add_paragraph(line)
 
     doc.save(output_file)

@@ -9,28 +9,36 @@ def generate_resume(
     client = get_groq_client()
 
     prompt = f"""
-You are an expert executive resume writer.
+You are an elite executive resume writer and career strategist.
 
-Your task is to rewrite and optimize the resume for the target job.
+Your objective is to create a highly competitive, ATS-optimized resume tailored to the target job description.
+
+The resume should be suitable for candidates at any level including:
+- Entry-level
+- Associate
+- Individual Contributor
+- Senior Professional
+- Manager
+- Director
+- Vice President
+- Executive Leadership
 
 Rules:
 
-1. Write naturally like a recruiter.
-2. Keep achievements realistic.
-3. Do not invent experience.
-4. Keep facts from the original resume.
-5. Improve ATS compatibility.
-6. Prioritize keywords from the job description.
-7. Use concise professional language.
-8. Never use:
-   - Results-driven
-   - Dynamic
-   - Proven track record
-   - Seasoned
-   - Highly motivated
-   - Strategic thinker
-9. Return ONLY the optimized resume.
-10. Use markdown formatting.
+1. Never invent experience, companies, projects, certifications, education, or achievements.
+2. Preserve factual accuracy from the original resume.
+3. Optimize the resume specifically for the target job description.
+4. Prioritize relevant keywords naturally.
+5. Improve clarity, readability, and ATS compatibility.
+6. Strengthen accomplishment statements using available evidence from the resume.
+7. Remove redundancy and weak language.
+8. Create a compelling professional summary aligned with the target role.
+9. Highlight measurable business impact wherever possible.
+10. Use concise and professional language.
+11. Focus on outcomes, ownership, responsibilities, and achievements.
+12. Ensure the final resume appears professionally written by a premium resume writing service.
+13. Return ONLY the optimized resume.
+14. Use markdown formatting.
 
 Resume:
 
