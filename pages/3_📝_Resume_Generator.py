@@ -3,6 +3,7 @@ import streamlit as st
 from services.pdf_services import extract_text_from_pdf
 from services.resume_generator_service import generate_resume
 from services.docx_service import create_resume_docx
+from services.pdf_resume_service import create_resume_pdf
 from services.supabase_service import get_supabase
 
 supabase = get_supabase()
@@ -57,7 +58,6 @@ if st.button("Generate Optimized Resume"):
             )
 
         st.session_state["generated_resume"] = optimized_resume
-
         st.session_state["first_name"] = first_name
         st.session_state["last_name"] = last_name
         st.session_state["company"] = company
@@ -128,17 +128,40 @@ if "generated_resume" in st.session_state:
         resume_filename
     )
 
-    with open(
-        docx_path,
-        "rb"
-    ) as file:
+    pdf_path = create_resume_pdf(
+        optimized_resume,
+        resume_filename
+    )
 
-        st.download_button(
-            label="📥 Download DOCX Resume",
-            data=file,
-            file_name=f"{resume_filename}.docx",
-            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-        )
+    col_docx, col_pdf = st.columns(2)
+
+    with col_docx:
+
+        with open(
+            docx_path,
+            "rb"
+        ) as file:
+
+            st.download_button(
+                label="📥 Download DOCX Resume",
+                data=file,
+                file_name=f"{resume_filename}.docx",
+                mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            )
+
+    with col_pdf:
+
+        with open(
+            pdf_path,
+            "rb"
+        ) as file:
+
+            st.download_button(
+                label="📄 Download PDF Resume",
+                data=file,
+                file_name=f"{resume_filename}.pdf",
+                mime="application/pdf"
+            )
 
     col1, col2 = st.columns(2)
 

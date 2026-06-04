@@ -19,7 +19,6 @@ def create_resume_docx(
     doc = Document()
 
     for line in resume_content.split("\n"):
-
         doc.add_paragraph(line)
 
     doc.save(output_file)
