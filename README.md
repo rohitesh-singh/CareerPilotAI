@@ -2,6 +2,20 @@
 
 ### AI-Powered Career Operating System
 
+## Screenshots
+
+| Dashboard | Resume Optimizer |
+|------------|------------|
+| ![](docs/screenshots/dashboard.png) | ![](docs/screenshots/resume_optimizer.png) |
+
+| Resume Generator | Analytics |
+|------------|------------|
+| ![](docs/screenshots/resume_generator.png) | ![](docs/screenshots/analytics.png) |
+
+| Application Tracker |
+|------------|
+| ![](docs/screenshots/application_tracker.png) |
+
 CareerPilotAI is an AI-powered platform that helps professionals optimize resumes, analyze job fit, generate tailored resumes, track applications, and monitor job search performance through a unified dashboard.
 
 Built using Streamlit, Groq, Supabase, and Python, the platform streamlines the job application process and provides actionable insights to improve interview outcomes.
