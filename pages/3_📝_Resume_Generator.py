@@ -2,6 +2,9 @@ import streamlit as st
 
 from services.pdf_services import extract_text_from_pdf
 from services.resume_generator_service import generate_resume
+from services.resume_parser_service import (
+    extract_candidate_details
+)
 from services.docx_service import create_resume_docx
 from services.pdf_resume_service import create_resume_pdf
 from services.supabase_service import get_supabase
@@ -12,27 +15,42 @@ st.title("📝 Resume Generator")
 
 first_name = st.text_input(
     "First Name",
-    value=st.session_state.get("first_name", "")
+    value=st.session_state.get(
+        "first_name",
+        ""
+    )
 )
 
 last_name = st.text_input(
     "Last Name",
-    value=st.session_state.get("last_name", "")
+    value=st.session_state.get(
+        "last_name",
+        ""
+    )
 )
 
 company = st.text_input(
     "Company Name",
-    value=st.session_state.get("company", "")
+    value=st.session_state.get(
+        "company",
+        ""
+    )
 )
 
 role = st.text_input(
     "Role",
-    value=st.session_state.get("role", "")
+    value=st.session_state.get(
+        "role",
+        ""
+    )
 )
 
 job_url = st.text_input(
     "Job URL (Optional)",
-    value=st.session_state.get("job_url", "")
+    value=st.session_state.get(
+        "job_url",
+        ""
+    )
 )
 
 uploaded_resume = st.file_uploader(
@@ -53,6 +71,25 @@ if st.button("Generate Optimized Resume"):
             uploaded_resume
         )
 
+        candidate = extract_candidate_details(
+            resume_text
+        )
+
+        full_name = candidate.get(
+            "name",
+            "Candidate"
+        )
+
+        name_parts = full_name.split()
+
+        if len(name_parts) >= 2:
+
+            first_name = name_parts[0]
+
+            last_name = " ".join(
+                name_parts[1:]
+            )
+
         with st.spinner(
             "Generating optimized resume..."
         ):
@@ -62,12 +99,29 @@ if st.button("Generate Optimized Resume"):
                 job_description
             )
 
-        st.session_state["generated_resume"] = optimized_resume
-        st.session_state["first_name"] = first_name
-        st.session_state["last_name"] = last_name
-        st.session_state["company"] = company
-        st.session_state["role"] = role
-        st.session_state["job_url"] = job_url
+        st.session_state[
+            "generated_resume"
+        ] = optimized_resume
+
+        st.session_state[
+            "first_name"
+        ] = first_name
+
+        st.session_state[
+            "last_name"
+        ] = last_name
+
+        st.session_state[
+            "company"
+        ] = company
+
+        st.session_state[
+            "role"
+        ] = role
+
+        st.session_state[
+            "job_url"
+        ] = job_url
 
         st.success(
             "Resume Generated Successfully"
@@ -112,6 +166,24 @@ if "generated_resume" in st.session_state:
             f"{match_score}%"
         )
 
+        if match_score >= 80:
+
+            st.success(
+                "🎯 Strong match"
+            )
+
+        elif match_score >= 60:
+
+            st.warning(
+                "⚠️ Moderate match"
+            )
+
+        else:
+
+            st.error(
+                "❌ Low match"
+            )
+
     existing = supabase.table(
         "generated_resumes"
     ).select(
@@ -133,6 +205,8 @@ if "generated_resume" in st.session_state:
 
     safe_role = (
         role.strip()
+        .replace("/", "_")
+        .replace("-", "_")
         .replace(" ", "_")
     )
 
@@ -249,7 +323,7 @@ if "generated_resume" in st.session_state:
                 ).execute()
 
                 st.success(
-                    "Application saved successfully."
+                    f"Application saved successfully with ATS Score {match_score}%"
                 )
 
             except Exception as e:
@@ -267,4 +341,3 @@ if "generated_resume" in st.session_state:
     st.markdown(
         optimized_resume
     )
-
