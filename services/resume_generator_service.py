@@ -38,7 +38,14 @@ Rules:
 11. Focus on outcomes, ownership, responsibilities, and achievements.
 12. Ensure the final resume appears professionally written by a premium resume writing service.
 13. Return ONLY the optimized resume.
-14. Use markdown formatting.
+14. Preserve all company names, dates and titles exactly.
+15. Never create placeholder contact details.
+16. Never create fictional metrics.
+17. Use role-specific keywords from the job description.
+18. Optimize for ATS parsing.
+19. Return clean markdown with clear sections.
+20. Keep leadership resumes strategic and IC resumes execution-focused.
+21. Maintain the candidate's actual career level.
 
 Resume:
 
