@@ -6,8 +6,12 @@ __pycache__/
 
 .streamlit/
 
-generated_resumes/*.docx
+generated_resumes/
 
+installed.txt
+requirements_backup.txt
+__pycache__/
+*.pyc
 .DS_Store
 
 .idea/
