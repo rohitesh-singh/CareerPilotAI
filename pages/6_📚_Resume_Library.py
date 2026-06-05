@@ -7,39 +7,46 @@ supabase = get_supabase()
 
 st.title("📚 Resume Library")
 
-response = supabase.table(
-    "generated_resumes"
-).select(
-    "*"
-).order(
-    "created_at",
-    desc=True
-).execute()
+try:
 
-data = response.data
-
-if len(data) == 0:
-
-    st.info(
-        "No saved resumes found."
+    response = (
+        supabase
+        .table("generated_resumes")
+        .select("*")
+        .order(
+            "created_at",
+            desc=True
+        )
+        .execute()
     )
 
-else:
+    data = response.data
 
-    df = pd.DataFrame(
-        data
+    if not data:
+
+        st.info(
+            "No resumes found."
+        )
+
+    else:
+
+        df = pd.DataFrame(data)
+
+        columns = [
+            "resume_filename",
+            "company",
+            "role",
+            "resume_version",
+            "created_at"
+        ]
+
+        st.dataframe(
+            df[columns],
+            use_container_width=True
+        )
+
+except Exception as e:
+
+    st.error(
+        str(e)
     )
-
-    for _, row in df.iterrows():
-
-        with st.expander(
-            f"{row['company']} | {row['role']}"
-        ):
-
-            st.text(
-                row["created_at"]
-            )
-
-            st.markdown(
-                row["resume_content"]
-            )

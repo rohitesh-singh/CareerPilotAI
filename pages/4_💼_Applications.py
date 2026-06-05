@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 
+from datetime import datetime
 from services.supabase_service import get_supabase
 
 supabase = get_supabase()
@@ -28,18 +29,27 @@ match_score = st.number_input(
     value=80
 )
 
+status_options = [
+    "Saved",
+    "Applied",
+    "Recruiter Screen",
+    "Interview Scheduled",
+    "Final Round",
+    "Offer",
+    "No Response"
+    "Rejected",
+    "Withdrawn"
+]
+
 status = st.selectbox(
     "Application Status",
-    [
-        "Saved",
-        "Applied",
-        "Interviewing",
-        "Offer",
-        "Rejected"
-    ]
+    status_options
 )
 
-from datetime import datetime
+notes = st.text_area(
+    "Notes",
+    height=100
+)
 
 if st.button("Save Application"):
 
@@ -56,7 +66,9 @@ if st.button("Save Application"):
                     "match_score": match_score,
                     "job_url": job_url,
                     "status": status,
-                    "applied_date": datetime.utcnow().isoformat()
+                    "notes": notes,
+                    "applied_date": datetime.utcnow().isoformat(),
+                    "updated_at": datetime.utcnow().isoformat()
                 }
             ).execute()
 
@@ -84,68 +96,178 @@ st.subheader(
 
 try:
 
-    response = supabase.table(
-        "applications"
-    ).select(
-        "*"
-    ).execute()
+    response = (
+        supabase
+        .table("applications")
+        .select("*")
+        .execute()
+    )
 
     data = response.data
 
     if len(data) > 0:
 
-        df = pd.DataFrame(
-            data
+        df = pd.DataFrame(data)
+
+        total_apps = len(df)
+
+        avg_score = round(
+            df["match_score"].mean(),
+            1
         )
 
-        st.dataframe(
-            df,
-            use_container_width=True
+        interviews = len(
+            df[
+                df["status"].isin(
+                    [
+                        "Recruiter Screen",
+                        "Interview Scheduled",
+                        "Final Round"
+                    ]
+                )
+            ]
         )
 
-        st.divider()
+        offers = len(
+            df[
+                df["status"] == "Offer"
+            ]
+        )
 
         col1, col2, col3, col4 = st.columns(4)
 
         with col1:
 
             st.metric(
-                "Total Applications",
-                len(df)
+                "Applications",
+                total_apps
             )
 
         with col2:
 
             st.metric(
-                "Applied",
-                len(
-                    df[
-                        df["status"] == "Applied"
-                    ]
-                )
+                "Avg ATS",
+                f"{avg_score}%"
             )
 
         with col3:
 
             st.metric(
-                "Interviewing",
-                len(
-                    df[
-                        df["status"] == "Interviewing"
-                    ]
-                )
+                "Interviews",
+                interviews
             )
 
         with col4:
 
             st.metric(
                 "Offers",
-                len(
-                    df[
-                        df["status"] == "Offer"
-                    ]
-                )
+                offers
             )
+
+        st.divider()
+
+        st.subheader(
+            "Update Application Status"
+        )
+
+        for row in data:
+
+            with st.expander(
+                f"{row['company']} | {row['role']}"
+            ):
+
+                st.write(
+                    f"ATS Score: {row.get('match_score', 0)}%"
+                )
+
+                st.write(
+                    f"Current Status: {row.get('status', '')}"
+                )
+
+                if row.get(
+                    "job_url"
+                ):
+
+                    st.write(
+                        row["job_url"]
+                    )
+
+                new_status = st.selectbox(
+                    "Update Status",
+                    status_options,
+                    index=status_options.index(
+                        row.get(
+                            "status",
+                            "Saved"
+                        )
+                    ),
+                    key=row["id"]
+                )
+
+                updated_notes = st.text_area(
+                    "Notes",
+                    value=row.get(
+                        "notes",
+                        ""
+                    ),
+                    key=f"notes_{row['id']}"
+                )
+
+                if st.button(
+                    "Update",
+                    key=f"update_{row['id']}"
+                ):
+
+                    try:
+
+                        supabase.table(
+                            "applications"
+                        ).update(
+                            {
+                                "status": new_status,
+                                "notes": updated_notes,
+                                "updated_at": datetime.utcnow().isoformat()
+                            }
+                        ).eq(
+                            "id",
+                            row["id"]
+                        ).execute()
+
+                        st.success(
+                            "Updated successfully."
+                        )
+
+                        st.rerun()
+
+                    except Exception as e:
+
+                        st.error(
+                            str(e)
+                        )
+
+        st.divider()
+
+        st.subheader(
+            "Application Data"
+        )
+
+        display_columns = [
+            col
+            for col in [
+                "company",
+                "role",
+                "match_score",
+                "status",
+                "applied_date",
+                "updated_at"
+            ]
+            if col in df.columns
+        ]
+
+        st.dataframe(
+            df[display_columns],
+            use_container_width=True
+        )
 
     else:
 
