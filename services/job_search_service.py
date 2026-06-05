@@ -17,62 +17,103 @@ APP_KEY = os.getenv(
 def search_jobs(
     role,
     location="India",
-    results=20
+    results=25
 ):
 
-    url = (
-        f"https://api.adzuna.com/v1/api/jobs/in/search/1"
-    )
+    if not APP_ID or not APP_KEY:
 
-    params = {
-        "app_id": APP_ID,
-        "app_key": APP_KEY,
-        "results_per_page": results,
-        "what": role,
-        "where": location,
-        "content-type": "application/json"
-    }
+        return []
 
-    response = requests.get(
-        url,
-        params=params,
-        timeout=30
-    )
+    try:
 
-    data = response.json()
-
-    jobs = []
-
-    for job in data.get(
-        "results",
-        []
-    ):
-
-        jobs.append(
-            {
-                "company": job.get(
-                    "company",
-                    {}
-                ).get(
-                    "display_name",
-                    ""
-                ),
-                "title": job.get(
-                    "title",
-                    ""
-                ),
-                "location": job.get(
-                    "location",
-                    {}
-                ).get(
-                    "display_name",
-                    ""
-                ),
-                "url": job.get(
-                    "redirect_url",
-                    ""
-                )
-            }
+        url = (
+            "https://api.adzuna.com/v1/api/jobs/in/search/1"
         )
 
-    return jobs
+        params = {
+            "app_id": APP_ID,
+            "app_key": APP_KEY,
+            "what": role,
+            "where": location,
+            "results_per_page": results,
+            "content-type": "application/json"
+        }
+
+        response = requests.get(
+            url,
+            params=params,
+            timeout=30
+        )
+
+        response.raise_for_status()
+
+        data = response.json()
+
+        jobs = []
+
+        for job in data.get(
+            "results",
+            []
+        ):
+
+            jobs.append(
+                {
+                    "company": (
+                        job.get(
+                            "company",
+                            {}
+                        ).get(
+                            "display_name",
+                            ""
+                        )
+                    ),
+
+                    "title": job.get(
+                        "title",
+                        ""
+                    ),
+
+                    "location": (
+                        job.get(
+                            "location",
+                            {}
+                        ).get(
+                            "display_name",
+                            ""
+                        )
+                    ),
+
+                    "url": job.get(
+                        "redirect_url",
+                        ""
+                    ),
+
+                    "description": job.get(
+                        "description",
+                        ""
+                    ),
+
+                    "created": job.get(
+                        "created",
+                        ""
+                    )
+                }
+            )
+
+        jobs.sort(
+            key=lambda x: x.get(
+                "created",
+                ""
+            ),
+            reverse=True
+        )
+
+        return jobs
+
+    except Exception as e:
+
+        print(
+            f"Job Search Error: {e}"
+        )
+
+        return []

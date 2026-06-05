@@ -1,5 +1,7 @@
 import streamlit as st
 
+from datetime import datetime, timezone
+
 from services.pdf_services import extract_text_from_pdf
 from services.job_recommendation_service import (
     recommend_roles
@@ -168,6 +170,18 @@ if "career_analysis" in st.session_state:
         ]
     )
 
+    job_age = st.selectbox(
+        "Posted Within",
+        [
+            "Any Time",
+            "24 Hours",
+            "3 Days",
+            "7 Days",
+            "14 Days"
+        ],
+        index=3
+    )
+
     if (
         selected_role
         != "No roles available"
@@ -200,19 +214,103 @@ if "career_analysis" in st.session_state:
             "live_jobs"
         ]
 
+        filtered_jobs = []
+
+        now = datetime.now(
+            timezone.utc
+        )
+
+        for job in jobs:
+
+            created = job.get(
+                "created",
+                ""
+            )
+
+            if not created:
+
+                filtered_jobs.append(
+                    job
+                )
+
+                continue
+
+            try:
+
+                job_date = datetime.fromisoformat(
+                    created.replace(
+                        "Z",
+                        "+00:00"
+                    )
+                )
+
+                age_days = (
+                    now - job_date
+                ).days
+
+                if job_age == "Any Time":
+
+                    filtered_jobs.append(
+                        job
+                    )
+
+                elif (
+                    job_age == "24 Hours"
+                    and age_days <= 1
+                ):
+
+                    filtered_jobs.append(
+                        job
+                    )
+
+                elif (
+                    job_age == "3 Days"
+                    and age_days <= 3
+                ):
+
+                    filtered_jobs.append(
+                        job
+                    )
+
+                elif (
+                    job_age == "7 Days"
+                    and age_days <= 7
+                ):
+
+                    filtered_jobs.append(
+                        job
+                    )
+
+                elif (
+                    job_age == "14 Days"
+                    and age_days <= 14
+                ):
+
+                    filtered_jobs.append(
+                        job
+                    )
+
+            except Exception:
+
+                filtered_jobs.append(
+                    job
+                )
+
         st.divider()
 
         st.subheader(
-            f"Live Jobs Found ({len(jobs)})"
+            f"Live Jobs Found ({len(filtered_jobs)})"
         )
 
-        if len(jobs) == 0:
+        if len(filtered_jobs) == 0:
 
             st.warning(
-                "No jobs found. Try another role or location."
+                "No jobs found for the selected time period."
             )
 
-        for idx, job in enumerate(jobs):
+        for idx, job in enumerate(
+            filtered_jobs
+        ):
 
             with st.expander(
                 f"{job['title']} | {job['company']}"
@@ -225,6 +323,17 @@ if "career_analysis" in st.session_state:
                 st.write(
                     f"📍 Location: {job['location']}"
                 )
+
+                created = job.get(
+                    "created",
+                    ""
+                )
+
+                if created:
+
+                    st.write(
+                        f"🕒 Posted: {created[:10]}"
+                    )
 
                 description = job.get(
                     "description",
