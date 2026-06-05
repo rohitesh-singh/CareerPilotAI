@@ -12,6 +12,28 @@ from services.job_search_service import (
 
 st.title("🔍 Job Discovery")
 
+st.info(
+    """
+### CareerPilotAI Beta
+
+This tool helps job seekers:
+
+• Discover suitable roles
+
+• Find live jobs
+
+• Analyze ATS match scores
+
+• Generate tailored resumes
+
+• Create cover letters
+
+• Track applications
+
+Feedback is welcome.
+"""
+)
+
 st.write(
     """
 Discover career opportunities based on your resume,
